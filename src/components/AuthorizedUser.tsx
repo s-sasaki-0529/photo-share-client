@@ -1,6 +1,7 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { ROOT_QUERY } from "../App";
 
 const GITHUB_AUTH_MUTATION = gql`
   mutation githubAuth($code: String!) {
@@ -13,6 +14,7 @@ const GITHUB_AUTH_MUTATION = gql`
 export const AuthorizedUser: React.FC = () => {
   const navigate = useNavigate();
   const [signingIn, setSigningIn] = useState(false);
+  const { refetch } = useQuery(ROOT_QUERY);
   const [requestGithubAuth] = useMutation(GITHUB_AUTH_MUTATION);
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export const AuthorizedUser: React.FC = () => {
         const token = result.data.githubAuth.token;
         localStorage.setItem("token", token);
         navigate("/", { replace: true });
+        refetch();
         setSigningIn(false);
       });
     }
